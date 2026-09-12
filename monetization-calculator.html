@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Monetization Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #14181f;
+    --ink-soft: #5b6472;
+    --paper: #f7f4ee;
+    --paper-dim: #ece7db;
+    --gold: #b8912a;
+    --gold-deep: #8f6f1f;
+    --teal: #2f6f6b;
+    --rust: #a64b2a;
+    --line: rgba(20,24,31,0.14);
+    --radius-s: 3px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .app{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 32px 80px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+  .masthead h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    line-height: 1.08;
+    margin: 0 0 16px;
+    color: var(--paper);
+  }
+  .masthead p{
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: rgba(247,244,238,0.72);
+    margin: 0;
+    max-width: 56ch;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    display: grid;
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  @media (max-width: 880px){
+    .layout{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Inputs panel ---------- */
+  .inputs{
+    background: rgba(247,244,238,0.04);
+    border: 1px solid rgba(247,244,238,0.12);
+    padding: 28px;
+  }
+
+  .panel-title{
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: rgba(247,244,238,0.5);
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(247,244,238,0.14);
+  }
+
+  .field-group{
+    margin-bottom: 22px;
+  }
+  .field-group label{
+    display: block;
+    font-size: 0.86rem;
+    color: rgba(247,244,238,0.85);
+    margin-bottom: 8px;
+  }
+  .field-row{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .field-row input[type="range"]{
+    flex: 1;
+  }
+  .field-value{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--gold);
+    min-width: 64px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  select{
+    width: 100%;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid rgba(247,244,238,0.25);
+    padding: 10px 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.92rem;
+    border-radius: var(--radius-s);
+  }
+  select:focus-visible, input:focus-visible, button:focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: rgba(247,244,238,0.25);
+    border-radius: 2px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 2px solid var(--ink);
+    box-shadow: 0 0 0 1px rgba(247,244,238,0.3);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 2px solid var(--ink);
+  }
+
+  /* Stream block */
+  .stream-block{
+    border-top: 1px solid rgba(247,244,238,0.14);
+    padding-top: 18px;
+    margin-top: 18px;
+  }
+  .stream-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .toggle{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 0.94rem;
+    color: var(--paper);
+    cursor: pointer;
+    margin: 0;
+  }
+  .toggle input[type="checkbox"]{
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid rgba(247,244,238,0.4);
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .toggle input[type="checkbox"]:checked{
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .toggle input[type="checkbox"]:checked::after{
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--ink);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .stream-fields{
+    padding-left: 25px;
+    transition: opacity 0.2s ease;
+  }
+  .stream-fields.is-off{
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .stream-fields .field-group{
+    margin-bottom: 16px;
+  }
+  .stream-fields .field-group:last-child{ margin-bottom: 0; }
+
+  /* ---------- Ledger panel ---------- */
+  .ledger{
+    background: var(--paper);
+    color: var(--ink);
+    padding: 0;
+  }
+
+  .ledger-total{
+    padding: 32px 32px 26px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 18px;
+  }
+  .ledger-total .label{
+    display: block;
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .ledger-total .amount{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .period-toggle{
+    display: flex;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-s);
+    overflow: hidden;
+  }
+  .period-toggle button{
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.84rem;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .period-toggle button.active{
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .period-toggle button:not(:last-child){
+    border-right: 1px solid var(--ink);
+  }
+
+  .ledger-rows{
+    padding: 8px 32px 4px;
+  }
+
+  .ledger-row{
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .ledger-row:last-child{ border-bottom: none; }
+  .ledger-row.is-disabled{ opacity: 0.38; }
+
+  .ledger-row-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .ledger-row-name{
+    font-size: 0.98rem;
+    font-weight: 500;
+  }
+  .ledger-row-amount{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .ledger-row-note{
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .ledger-row-bar{
+    margin-top: 10px;
+    height: 4px;
+    background: var(--paper-dim);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .ledger-row-bar-fill{
+    height: 100%;
+    transition: width 0.35s ease;
+  }
+  .fill-ads{ background: var(--teal); }
+  .fill-sponsor{ background: var(--gold-deep); }
+  .fill-member{ background: var(--rust); }
+  .fill-affiliate{ background: #6a5a8c; }
+
+  .ledger-note{
+    padding: 18px 32px 28px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 520px){
+    .app{ padding: 36px 18px 60px; }
+    .inputs{ padding: 22px; }
+    .ledger-total, .ledger-rows, .ledger-note{ padding-left: 22px; padding-right: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="masthead">
+    <h1>Creator Monetization Ledger</h1>
+    <p>Set your audience and posting habits, then switch on the income streams that apply to you. The ledger on the right totals up a realistic monthly estimate.</p>
+  </header>
+
+  <div class="layout">
+
+    <!-- INPUTS -->
+    <section class="inputs">
+      <p class="panel-title">Your numbers</p>
+
+      <div class="field-group">
+        <label for="platform">Platform</label>
+        <select id="platform">
+          <option value="youtube" data-cpm="4.0" data-sponsor="12">YouTube</option>
+          <option value="instagram" data-cpm="2.2" data-sponsor="9">Instagram</option>
+          <option value="tiktok" data-cpm="1.0" data-sponsor="6">TikTok</option>
+          <option value="newsletter" data-cpm="9.0" data-sponsor="18">Newsletter</option>
+          <option value="blog" data-cpm="6.0" data-sponsor="10">Blog</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="niche">Niche</label>
+        <select id="niche">
+          <option value="1.9">Finance &amp; investing</option>
+          <option value="1.5">Technology</option>
+          <option value="1.4">Business</option>
+          <option value="1.3">Education</option>
+          <option value="1.2">Health &amp; fitness</option>
+          <option value="1.1">Beauty &amp; fashion</option>
+          <option value="1.0" selected>Gaming</option>
+          <option value="1.0">Food &amp; cooking</option>
+          <option value="0.95">Travel</option>
+          <option value="0.9">Lifestyle &amp; vlogging</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="followers">Followers / subscribers</label>
+        <div class="field-row">
+          <input type="range" id="followers" min="0" max="100" value="52" step="1">
+          <span class="field-value" id="followersOut">—</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="views">Average views per post</label>
+        <div class="field-row">
+          <input type="range" id="views" min="0" max="100" value="45" step="1">
+          <span class="field-value" id="viewsOut">—</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="posts">Posts per month</label>
+        <div class="field-row">
+          <input type="range" id="posts" min="1" max="30" value="8" step="1">
+          <span class="field-value" id="postsOut">—</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="engagement">Engagement rate</label>
+        <div class="field-row">
+          <input type="range" id="engagement" min="0.5" max="15" value="3.5" step="0.1">
+          <span class="field-value" id="engagementOut">—</span>
+        </div>
+      </div>
+
+      <!-- AD REVENUE -->
+      <div class="stream-block">
+        <div class="stream-head">
+          <label class="toggle"><input type="checkbox" id="toggleAds" checked> Ad revenue</label>
+        </div>
+        <div class="stream-fields" id="fieldsAds">
+          <p class="ledger-row-note" style="margin:-6px 0 14px;">Based on views, platform CPM, and niche.</p>
+        </div>
+      </div>
+
+      <!-- SPONSORSHIPS -->
+      <div class="stream-block">
+        <div class="stream-head">
+          <label class="toggle"><input type="checkbox" id="toggleSponsor" checked> Sponsorships</label>
+        </div>
+        <div class="stream-fields" id="fieldsSponsor">
+          <div class="field-group">
+            <label for="sponsoredPosts">Sponsored posts per month</label>
+            <div class="field-row">
+              <input type="range" id="sponsoredPosts" min="0" max="10" value="1" step="1">
+              <span class="field-value" id="sponsoredPostsOut">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERSHIPS -->
+      <div class="stream-block">
+        <div class="stream-head">
+          <label class="toggle"><input type="checkbox" id="toggleMember"> Memberships</label>
+        </div>
+        <div class="stream-fields is-off" id="fieldsMember">
+          <div class="field-group">
+            <label for="memberPercent">Share of audience who subscribe</label>
+            <div class="field-row">
+              <input type="range" id="memberPercent" min="0" max="10" value="1.5" step="0.1">
+              <span class="field-value" id="memberPercentOut">—</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="memberPrice">Price per member / month</label>
+            <div class="field-row">
+              <input type="range" id="memberPrice" min="1" max="50" value="5" step="1">
+              <span class="field-value" id="memberPriceOut">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFFILIATE -->
+      <div class="stream-block">
+        <div class="stream-head">
+          <label class="toggle"><input type="checkbox" id="toggleAffiliate"> Affiliate &amp; products</label>
+        </div>
+        <div class="stream-fields is-off" id="fieldsAffiliate">
+          <div class="field-group">
+            <label for="ctr">Click-through rate</label>
+            <div class="field-row">
+              <input type="range" id="ctr" min="0.1" max="10" value="2" step="0.1">
+              <span class="field-value" id="ctrOut">—</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="conversion">Conversion rate</label>
+            <div class="field-row">
+              <input type="range" id="conversion" min="0.5" max="20" value="3" step="0.1">
+              <span class="field-value" id="conversionOut">—</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="commission">Average commission per sale</label>
+            <div class="field-row">
+              <input type="range" id="commission" min="1" max="100" value="15" step="1">
+              <span class="field-value" id="commissionOut">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- LEDGER -->
+    <section class="ledger">
+      <div class="ledger-total">
+        <div>
+          <span class="label">Estimated earnings</span>
+          <span class="amount" id="totalAmount">$0</span>
+        </div>
+        <div class="period-toggle" role="group" aria-label="Time period">
+          <button type="button" class="active" data-period="1">Monthly</button>
+          <button type="button" data-period="12">Annual</button>
+        </div>
+      </div>
+
+      <div class="ledger-rows" id="ledgerRows">
+
+        <div class="ledger-row" id="rowAds">
+          <div class="ledger-row-top">
+            <span class="ledger-row-name">Ad revenue</span>
+            <span class="ledger-row-amount" id="amountAds">$0</span>
+          </div>
+          <p class="ledger-row-note" id="noteAds"></p>
+          <div class="ledger-row-bar"><div class="ledger-row-bar-fill fill-ads" id="barAds"></div></div>
+        </div>
+
+        <div class="ledger-row" id="rowSponsor">
+          <div class="ledger-row-top">
+            <span class="ledger-row-name">Sponsorships</span>
+            <span class="ledger-row-amount" id="amountSponsor">$0</span>
+          </div>
+          <p class="ledger-row-note" id="noteSponsor"></p>
+          <div class="ledger-row-bar"><div class="ledger-row-bar-fill fill-sponsor" id="barSponsor"></div></div>
+        </div>
+
+        <div class="ledger-row" id="rowMember">
+          <div class="ledger-row-top">
+            <span class="ledger-row-name">Memberships</span>
+            <span class="ledger-row-amount" id="amountMember">$0</span>
+          </div>
+          <p class="ledger-row-note" id="noteMember"></p>
+          <div class="ledger-row-bar"><div class="ledger-row-bar-fill fill-member" id="barMember"></div></div>
+        </div>
+
+        <div class="ledger-row" id="rowAffiliate">
+          <div class="ledger-row-top">
+            <span class="ledger-row-name">Affiliate &amp; products</span>
+            <span class="ledger-row-amount" id="amountAffiliate">$0</span>
+          </div>
+          <p class="ledger-row-note" id="noteAffiliate"></p>
+          <div class="ledger-row-bar"><div class="ledger-row-bar-fill fill-affiliate" id="barAffiliate"></div></div>
+        </div>
+
+      </div>
+
+      <p class="ledger-note">These are directional estimates built from common industry rate ranges, not a guarantee. Actual earnings vary by audience quality, region, seasonality, and individual deals.</p>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  // ---- exponential slider mapping ----
+  function expMap(x, min, max){
+    // x in 0..100 -> min..max on an exponential curve
+    const t = x / 100;
+    return Math.round(min * Math.pow(max / min, t));
+  }
+
+  function fmtCompact(n){
+    if(n >= 1000000) return (n/1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'M';
+    if(n >= 1000) return (n/1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K';
+    return String(n);
+  }
+
+  function fmtCurrency(n){
+    return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits: 0 }).format(n);
+  }
+
+  // ---- elements ----
+  const platformEl = $('platform');
+  const nicheEl = $('niche');
+
+  const followersEl = $('followers');
+  const viewsEl = $('views');
+  const postsEl = $('posts');
+  const engagementEl = $('engagement');
+
+  const toggleAds = $('toggleAds');
+  const toggleSponsor = $('toggleSponsor');
+  const toggleMember = $('toggleMember');
+  const toggleAffiliate = $('toggleAffiliate');
+
+  const sponsoredPostsEl = $('sponsoredPosts');
+  const memberPercentEl = $('memberPercent');
+  const memberPriceEl = $('memberPrice');
+  const ctrEl = $('ctr');
+  const conversionEl = $('conversion');
+  const commissionEl = $('commission');
+
+  let periodMultiplier = 1;
+
+  function currentFollowers(){ return expMap(+followersEl.value, 1000, 5000000); }
+  function currentViews(){ return expMap(+viewsEl.value, 100, 2000000); }
+
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function updateReadouts(){
+    followersEl.nextElementSibling.textContent = fmtCompact(currentFollowers());
+    viewsEl.nextElementSibling.textContent = fmtCompact(currentViews());
+    postsEl.nextElementSibling.textContent = postsEl.value;
+    engagementEl.nextElementSibling.textContent = (+engagementEl.value).toFixed(1) + '%';
+    sponsoredPostsEl.nextElementSibling.textContent = sponsoredPostsEl.value;
+    memberPercentEl.nextElementSibling.textContent = (+memberPercentEl.value).toFixed(1) + '%';
+    memberPriceEl.nextElementSibling.textContent = '$' + memberPriceEl.value;
+    ctrEl.nextElementSibling.textContent = (+ctrEl.value).toFixed(1) + '%';
+    conversionEl.nextElementSibling.textContent = (+conversionEl.value).toFixed(1) + '%';
+    commissionEl.nextElementSibling.textContent = '$' + commissionEl.value;
+  }
+
+  function toggleFieldVisibility(toggleEl, fieldsEl, rowEl){
+    const on = toggleEl.checked;
+    fieldsEl.classList.toggle('is-off', !on);
+    rowEl.classList.toggle('is-disabled', !on);
+  }
+
+  function compute(){
+    updateReadouts();
+
+    const followers = currentFollowers();
+    const views = currentViews();
+    const posts = +postsEl.value;
+    const engagement = +engagementEl.value;
+    const nicheMult = +nicheEl.value;
+
+    const platformOpt = platformEl.options[platformEl.selectedIndex];
+    const cpm = +platformOpt.dataset.cpm;
+    const sponsorBase = +platformOpt.dataset.sponsor;
+
+    const engagementFactor = clamp(1 + (engagement - 3) / 10, 0.4, 2.5);
+
+    // Ad revenue
+    const monthlyViews = views * posts;
+    const adRevenue = (monthlyViews / 1000) * cpm * nicheMult;
+
+    // Sponsorships
+    const sponsoredPosts = +sponsoredPostsEl.value;
+    const valuePerDeal = (followers / 1000) * sponsorBase * nicheMult * engagementFactor;
+    const sponsorRevenue = valuePerDeal * sponsoredPosts;
+
+    // Memberships
+    const memberPct = +memberPercentEl.value;
+    const memberPrice = +memberPriceEl.value;
+    const memberRevenue = followers * (memberPct / 100) * memberPrice;
+
+    // Affiliate
+    const ctr = +ctrEl.value;
+    const conversion = +conversionEl.value;
+    const commission = +commissionEl.value;
+    const clicks = monthlyViews * (ctr / 100);
+    const sales = clicks * (conversion / 100);
+    const affiliateRevenue = sales * commission;
+
+    const streams = [
+      { key: 'Ads', on: toggleAds.checked, value: adRevenue,
+        note: fmtCompact(monthlyViews) + ' monthly views × $' + cpm.toFixed(2) + ' CPM × ' + nicheMult.toFixed(1) + ' niche factor' },
+      { key: 'Sponsor', on: toggleSponsor.checked, value: sponsorRevenue,
+        note: sponsoredPosts + ' deal(s) × ~' + fmtCurrency(valuePerDeal) + ' per deal' },
+      { key: 'Member', on: toggleMember.checked, value: memberRevenue,
+        note: fmtCompact(Math.round(followers * memberPct / 100)) + ' paying members × $' + memberPrice + '/mo' },
+      { key: 'Affiliate', on: toggleAffiliate.checked, value: affiliateRevenue,
+        note: fmtCompact(Math.round(sales)) + ' est. sales × $' + commission + ' commission' },
+    ];
+
+    const activeTotal = streams.reduce((sum, s) => sum + (s.on ? s.value : 0), 0);
+    const maxForBars = Math.max(...streams.map(s => s.value), 1);
+
+    $('totalAmount').textContent = fmtCurrency(activeTotal * periodMultiplier);
+
+    $('amountAds').textContent = fmtCurrency(adRevenue * periodMultiplier);
+    $('noteAds').textContent = streams[0].note;
+    $('barAds').style.width = (streams[0].on ? (adRevenue / maxForBars) * 100 : 0) + '%';
+
+    $('amountSponsor').textContent = fmtCurrency(sponsorRevenue * periodMultiplier);
+    $('noteSponsor').textContent = streams[1].note;
+    $('barSponsor').style.width = (streams[1].on ? (sponsorRevenue / maxForBars) * 100 : 0) + '%';
+
+    $('amountMember').textContent = fmtCurrency(memberRevenue * periodMultiplier);
+    $('noteMember').textContent = streams[2].note;
+    $('barMember').style.width = (streams[2].on ? (memberRevenue / maxForBars) * 100 : 0) + '%';
+
+    $('amountAffiliate').textContent = fmtCurrency(affiliateRevenue * periodMultiplier);
+    $('noteAffiliate').textContent = streams[3].note;
+    $('barAffiliate').style.width = (streams[3].on ? (affiliateRevenue / maxForBars) * 100 : 0) + '%';
+
+    toggleFieldVisibility(toggleAds, $('fieldsAds'), $('rowAds'));
+    toggleFieldVisibility(toggleSponsor, $('fieldsSponsor'), $('rowSponsor'));
+    toggleFieldVisibility(toggleMember, $('fieldsMember'), $('rowMember'));
+    toggleFieldVisibility(toggleAffiliate, $('fieldsAffiliate'), $('rowAffiliate'));
+  }
+
+  // ---- wire up events ----
+  const allInputs = [
+    platformEl, nicheEl, followersEl, viewsEl, postsEl, engagementEl,
+    toggleAds, toggleSponsor, toggleMember, toggleAffiliate,
+    sponsoredPostsEl, memberPercentEl, memberPriceEl, ctrEl, conversionEl, commissionEl
+  ];
+  allInputs.forEach(el => el.addEventListener('input', compute));
+
+  document.querySelectorAll('.period-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      periodMultiplier = +btn.dataset.period;
+      compute();
+    });
+  });
+
+  compute();
+})();
+</script>
+
+</body>
+</html>
